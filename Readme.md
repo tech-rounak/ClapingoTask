@@ -1,6 +1,4 @@
-# MUSEUM API
-
-It is a simple project to get the stats of a museum in a particular date
+# CLAPINGO TASK
 
 ## Tech Stacks
 `NodeJS`
