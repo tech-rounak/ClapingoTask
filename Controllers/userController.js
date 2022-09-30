@@ -15,7 +15,7 @@ const userSignup = async(req,res) => {
             user_type : req.body.type,
             count : 0
         })
-        console.log(newUser)
+        // console.log(newUser)
         
         await newUser.save();
 
@@ -50,26 +50,22 @@ const userSignin = async(req,res) =>{
         const{email,password} = req.body;
         const query={$and:[{email:email},{password:password}]}
         const user = await User.findOne(query)
-        console.log(user);
+        // console.log(user);
         const payload = {
             user: {
               id: user.id,
               user_type: user.user_type,
             },
           };
-          // sendEmailVerificationLink(email, user.id);
-      
           jwt.sign(
             payload,
             process.env.TOKEN_KEY,
             { expiresIn: '7d' },
             (err, token) => {
               if (err) throw err;
-              return res.json({ token });
+              return res.json({user, token });
             },
           );
-
-        // return res.status(200).json(newUser)
     }catch(err){
         console.log(err)
         return res.status(400).send(err);
@@ -100,13 +96,13 @@ const addTeacher = async(req,res)=>{
           learnerUser.favMentor = favMentor;
           learnerUser.save();
 
-          console.log(learnerUser)
+          // console.log(learnerUser)
 
           const tmpUser = await User.find({name:favTeacher});
           const mentorUser = tmpUser[0];
           mentorUser.count = mentorUser.count+1;
           mentorUser.save();
-          console.log(mentorUser);
+          // console.log(mentorUser);
           res.json({mentorUser,learnerUser})
 
         }
@@ -115,6 +111,42 @@ const addTeacher = async(req,res)=>{
       console.log(err)
       return res.status(400).send(err);
     }
+}
+const removeTeacher = async(req,res) => {
+  try{
+    const favTeacher = req.body.favTeacher;
+    const learnerId = req.user.id;
+    const learnerUser = await User.findById(learnerId);
+    let isPresent = 1 , favMentor = learnerUser.favMentor,newMentor=[];
+    for(let  i = 0 ; i <favMentor.length ; i++){
+        if(favMentor[i] === favTeacher){
+            isPresent = 1;
+        }
+        if(favMentor[i]!=favMentor){
+          newMentor.push(favMentor[i])
+        }
+    }
+    if(isPresent === 1){
+        res.send("Teacher Not Present")
+    }
+    if(isPresent === 0){
+      learnerUser.favMentor = newMentor;
+      learnerUser.save();
+
+
+
+      const tmpUser = await User.find({name:favTeacher});
+      const mentorUser = tmpUser[0];
+      mentorUser.count = mentorUser.count-1;
+      mentorUser.save();
+      res.json({mentorUser,learnerUser})
+
+    }
+   
+  }catch(err){
+    console.log(err)
+    return res.status(400).send(err);
+  }
 }
 const favouriteTeacher = async(req,res)=>{
   try{
@@ -132,4 +164,4 @@ const favouriteTeacher = async(req,res)=>{
     return res.status(400).send(err);
   }
 }
-module.exports = {userSignup,userSignin,addTeacher,favouriteTeacher}
+module.exports = {userSignup,userSignin,addTeacher,favouriteTeacher,removeTeacher}
