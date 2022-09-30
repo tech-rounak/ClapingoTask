@@ -47,6 +47,8 @@ and in Body
 
 ### for adding teacher to favourite list
 PUT : http://localhost:3000/user/addFavouriteTeacher
+### for deleting teacher from the list
+PUT : http://localhost:3000/user/removeFavouriteTeacher
 
 user must pass the token recieved at the time of signin to 
 Headers
