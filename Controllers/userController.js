@@ -26,8 +26,7 @@ const userSignup = async(req,res) => {
             },
           };
       
-          // sendEmailVerificationLink(email, user.id);
-      
+             
           jwt.sign(
             payload,
             process.env.TOKEN_KEY,
